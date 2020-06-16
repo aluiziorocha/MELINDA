@@ -23,7 +23,7 @@ sender = imagezmq.ImageSender(connect_to='tcp://*:5555', REQ_REP=False)
 # optionally, turn on the LED area lighting
 # use_led = False  # set to True or False as needed
 # optionally, filp the image vertically
-flip = True  # set to True of False as needed
+flip = False  # set to True of False as needed
 
 # if use_led:
 #     GPIO.setmode(GPIO.BCM)

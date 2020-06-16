@@ -9,8 +9,12 @@ from collections import defaultdict
 from imutils.video import FPS
 import imagezmq
 
+publishers = ['tcp://localhost:5555', 'tcp://192.168.0.8:5555']
 # instantiate image_hub
-image_hub = imagezmq.ImageHub(open_port='tcp://192.168.0.8:5555', REQ_REP=False)
+image_hub = imagezmq.ImageHub(open_port=publishers[0], REQ_REP=False)
+if len(publishers) > 1:
+    for publisher in publishers[1:]:
+        image_hub.connect(open_port=publisher)
 
 image_count = 0
 sender_image_counts = defaultdict(int)  # dict for counts by sender

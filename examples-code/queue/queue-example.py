@@ -24,7 +24,8 @@ for item in range(10):
     # put item on queue (as the last item)
     q.put(item)
 print('All task requests sent\n', end='')
+print('Items on queue: ', q.qsize())
 
 # block until all tasks are done, when using q.task_done()
 q.join()
-print('All work completed')
+
