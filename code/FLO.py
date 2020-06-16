@@ -6,7 +6,7 @@ import imagezmq
 from imutils import resize
 
 jpeg_quality = 90
-image_hub = imagezmq.ImageHub(open_port='tcp://*:5565', REQ_REP=True)
+image_hub = imagezmq.ImageHub(open_port='tcp://*:5565')
 
 try:
     while True:
@@ -14,8 +14,8 @@ try:
         # print("Received image from {}".format(node_name))
         image = cv2.imdecode(np.frombuffer(jpg_buffer, dtype='uint8'), -1)
         image = resize(image, width=400)
-        ret_code, jpg_buffer = cv2.imencode(
-            ".jpg", image, [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality])
+        _, jpg_buffer = cv2.imencode(".jpg", image,
+                                     [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality])
         image_hub.send_reply(jpg_buffer)
 
 except (KeyboardInterrupt, SystemExit):
@@ -26,3 +26,5 @@ except Exception as ex:
     print('Traceback error:', ex)
     traceback.print_exc()
 
+finally:
+    print("Done")

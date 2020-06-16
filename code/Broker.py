@@ -1,50 +1,71 @@
 # This is the Broker component managing the communications among nodes
 
 import queue
+import sys
 import threading
 import traceback
-import cv2
 import imagezmq
-import numpy as np
-# , 'tcp://192.168.0.8:5555'
-workers_url = ['tcp://localhost:5565']
 
-mq = queue.Queue()  # Messages Queue as FIFO (First-In, First-Out)
-image_hub = imagezmq.ImageHub()  # Hub to receive images of interest
-frameDict = {}
+flo_urls = ['tcp://localhost:5565']  # , 'tcp://192.168.0.8:5555'
+dlo_urls = ['tcp://localhost:5575']
+
+imq = queue.Queue()  # Input Messages Queue (FIFO - First-In, First-Out)
+omq = queue.Queue()  # Output Messages Queue
+image_hub = imagezmq.ImageHub(open_port='tcp://*:5555')  # Hub to receive images of interest
 
 
-def worker_task(worker_url):
-    sender = imagezmq.ImageSender(connect_to=worker_url)
-    while True:
+def flo_task(node_url):
+    t = threading.currentThread()
+    sender = imagezmq.ImageSender(connect_to=node_url)
+    while getattr(t, "do_run", True):
         # get the first item queued. It's blocking
         # until there is an item on queue
-        (node_name, jpg_buffer) = mq.get()
+        (node_name, jpg_buffer) = imq.get()
         reply = sender.send_jpg(node_name, jpg_buffer)
-        image = cv2.imdecode(np.frombuffer(reply, dtype='uint8'), -1)
-        frameDict[node_name] = image
+        omq.put((node_name, reply))
         # remove item from queue
-        mq.task_done()
+        imq.task_done()
+    print("Closing connection with FLO node ", node_url)
+    sender.close()  # close the ZMQ socket and context
+
+
+def dlo_task(node_url):
+    t = threading.currentThread()
+    sender = imagezmq.ImageSender(connect_to=node_url)
+    while getattr(t, "do_run", True):
+        # get the first item queued. It's blocking
+        # until there is an item on queue
+        (node_name, jpg_buffer) = omq.get()
+        sender.send_jpg(node_name, jpg_buffer)
+        # remove item from queue
+        omq.task_done()
+    print("Closing connection with DLO node ", node_url)
+    sender.close()  # close the ZMQ socket and context
 
 
 def main():
-    # Start background tasks
-    for worker_url in workers_url:
-        thread = threading.Thread(target=worker_task, args=(worker_url,))
+    # Start background task threads
+    def thread_gen(fltasks, dltasks):
+        threads = []
+        for fltask in fltasks:
+            t = threading.Thread(target=flo_task, args=(fltask,))
+            threads.append(t)
+        for dltask in dltasks:
+            t = threading.Thread(target=dlo_task, args=(dltask,))
+            threads.append(t)
+        return threads
+
+    threads = thread_gen(flo_urls, dlo_urls)
+    for thread in threads:
         thread.start()
 
     try:
         while True:
             node_name, jpg_buffer = image_hub.recv_jpg()
             image_hub.send_reply()
-            mq.put((node_name, jpg_buffer))
-            for key in frameDict.keys():
-                cv2.imshow(key, frameDict[key])
-            # detect any kepresses
-            key = cv2.waitKey(1) & 0xFF
-            # if the `q` key was pressed, break from the loop
-            if key == ord("q"):
-                break
+            imq.put((node_name, jpg_buffer))
+            # code to check if input queue is full and new
+            # FLO nodes must rise to process it
 
     except (KeyboardInterrupt, SystemExit):
         pass  # Ctrl-C was pressed to end program
@@ -55,8 +76,13 @@ def main():
         traceback.print_exc()
 
     finally:
-        cv2.destroyAllWindows()
-        print("Done.")
+        # Stop all threads
+        print("Stopping threads...")
+        for thread in threads:
+            thread.do_run = False
+            thread.join()
+        print("Done")
+        sys.exit()
 
 
 if __name__ == "__main__":
