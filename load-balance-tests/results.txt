@@ -1,0 +1,42 @@
+Statistics per node --------
+Node				Messages	Processing (total, avg)		Waiting (total, avg)
+tcp://localhost:5557	34		15425, 453.7					0, 0.000
+tcp://localhost:5555	31		15813, 510.1					2, 0.064
+tcp://localhost:5556	34		16149, 475.0					0, 0.000
+------
+tcp://localhost:5556	34		16450, 483.8					0, 0.000
+tcp://localhost:5557	36		16111, 447.5					3, 0.083
+tcp://localhost:5555	29		16646, 574.0					1, 0.034
+------
+tcp://localhost:5557	33		17181, 520.6					1, 0.030
+tcp://localhost:5555	35		17284, 493.8					1, 0.028
+tcp://localhost:5556	31		16819, 542.5					1, 0.032
+------
+tcp://localhost:5557	33		17890, 542.1					1, 0.030
+tcp://localhost:5555	33		17592, 533.1					1, 0.030
+tcp://localhost:5556	33		17834, 540.4					6, 0.181
+------
+tcp://localhost:5557	37		17723, 479.0					0, 0.000
+tcp://localhost:5556	33		18030, 546.4					0, 0.000
+tcp://localhost:5555	29		17843, 615.3					1, 0.034
+------
+tcp://localhost:5555	33		17822, 540.1					2, 0.061
+tcp://localhost:5556	31		17140, 552.9					0, 0.000
+tcp://localhost:5557	35		17704, 505.8					2, 0.057
+------
+tcp://localhost:5555	34		16105, 473.7					0, 0.000
+tcp://localhost:5556	31		15714, 506.9					0, 0.000
+tcp://localhost:5557	34		15764, 463.6					0, 0.000
+------
+tcp://localhost:5555	29		16364, 564.3					3, 0.103
+tcp://localhost:5556	38		15806, 415.9					4, 0.105
+tcp://localhost:5557	32		15673, 489.8					0, 0.000
+------
+tcp://localhost:5556	34		18546, 545.5					5, 0.147
+tcp://localhost:5557	33		19494, 590.7					2, 0.061
+tcp://localhost:5555	32		18889, 590.3					0, 0.000
+------
+tcp://localhost:5556	33		15633, 473.7					0, 0.000
+tcp://localhost:5555	33		15764, 477.7					0, 0.000
+tcp://localhost:5557	33		15020, 455.2					1, 0.030
+------
