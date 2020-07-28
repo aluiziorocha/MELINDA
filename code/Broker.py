@@ -100,6 +100,8 @@ def main(mode=UNICAST):
 
             # code to check if input queue is full and new
             # FLO nodes must rise to process it
+            # if imq.qsize() > threashold and timer > 1 min:
+            #    notify "instance new FLO node"
 
     except (KeyboardInterrupt, SystemExit):
         pass  # Ctrl-C was pressed to end program

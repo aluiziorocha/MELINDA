@@ -12,7 +12,9 @@ ap.add_argument("-p", "--port", type=int, default=5555,
                 help="First Worker port to connect")
 ap.add_argument("-w", "--workers", type=int, default=3,
                 help="Number of workers to connect")
-ap.add_argument("-m", "--messages", type=int, default=99,
+ap.add_argument("-f", "--fps", default='40,20,10',
+                help="Processing capacities in FPS separated by comma, e.g, '40,20,10'")
+ap.add_argument("-m", "--messages", type=int, default=1000,
                 help="Number of messages to process")
 args = vars(ap.parse_args())
 
@@ -20,12 +22,17 @@ worker_urls = []
 for i in range(args["port"], args["port"] + args["workers"]):
     worker_urls.append("tcp://localhost:{}".format(i))
 
+listFPS = args["fps"].split(',')
+worker_time_to_process = []
+for fps in listFPS:
+    worker_time_to_process.append(int(1000/int(fps)))
+
 # Global queues accessed by threads
 imq = queue.Queue()  # Input message queue (FIFO - First-In, First-Out)
 omq = queue.Queue()  # Output message queue
 
 
-def worker_thread(node_url, context=None):
+def worker_thread(node_url, time_to_process, context=None):
     t = threading.currentThread()
     context = context or zmq.Context.instance()
     socket = context.socket(zmq.REQ)
@@ -37,7 +44,7 @@ def worker_thread(node_url, context=None):
         try:
             # Get the first item queued.
             # If queue is empty raise the Empty exception
-            time_to_process = imq.get(block=False)
+            _ = imq.get(block=False)
             socket.send_string(u'%i' % time_to_process)
             time_waiting = socket.recv()
             omq.put((node_url, time_to_process, int(time_waiting)))
@@ -55,8 +62,8 @@ def main():
 
     # Start background task threads
     wrkthreads = []
-    for node in worker_urls:
-        t = threading.Thread(target=worker_thread, args=(node,))
+    for node, time_to_process in zip(worker_urls, worker_time_to_process):
+        t = threading.Thread(target=worker_thread, args=(node, time_to_process,))
         wrkthreads.append(t)
 
     for thread in wrkthreads:
@@ -106,7 +113,8 @@ def main():
             print("{}\t{}\t\t{}, {:.1f}\t\t\t\t\t{}, {:.3f}".format(node, msg_counts[node], time_proc[node],
                                                           time_proc[node] / msg_counts[node],
                                                           time_wait[node], time_wait[node] / msg_counts[node]))
-        print("------\nDone")
+        print("-"*20 + "\t{} messages".format(args["messages"]))
+        print("Done")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,38 @@
+Statistics --------- 5555 = 40 FPS, 5556 = 20 FPS, 5557 = 10 FPS
+Node				Messages	Processing (total, avg)		Waiting (total, avg)
+tcp://localhost:5555	54		1350, 25.0					9, 0.167
+tcp://localhost:5556	30		1500, 50.0					2, 0.067
+tcp://localhost:5557	16		1600, 100.0					3, 0.188
+--------------------	100 messages
+tcp://localhost:5555	164		4100, 25.0					11, 0.067
+tcp://localhost:5556	89		4450, 50.0					3, 0.034
+tcp://localhost:5557	47		4700, 100.0					1, 0.021
+--------------------	300 messages
+tcp://localhost:5555	329		8225, 25.0					50, 0.152
+tcp://localhost:5556	178		8900, 50.0					13, 0.073
+tcp://localhost:5557	93		9300, 100.0					19, 0.204
+--------------------	600 messages
+tcp://localhost:5555	548		13700, 25.0					106, 0.193
+tcp://localhost:5556	297		14850, 50.0					54, 0.182
+tcp://localhost:5557	155		15500, 100.0				39, 0.252
+--------------------	1000 messages
+
+Statistics --------- 5555 = 60 FPS, 5556 = 30 FPS, 5557 = 10 FPS
+Node				Messages	Processing (total, avg)		Waiting (total, avg)
+tcp://localhost:5555	59		944, 16.0					8, 0.136
+tcp://localhost:5556	30		990, 33.0					9, 0.300
+tcp://localhost:5557	11		1100, 100.0					2, 0.182
+--------------------	100 messages
+tcp://localhost:5555	175		2800, 16.0					22, 0.126
+tcp://localhost:5556	92		3036, 33.0					8, 0.087
+tcp://localhost:5557	33		3300, 100.0					1, 0.030
+--------------------    300 messages
+tcp://localhost:5555	355		5680, 16.0					21, 0.059
+tcp://localhost:5556	180		5940, 33.0					12, 0.067
+tcp://localhost:5557	65		6500, 100.0					3, 0.046
+--------------------	600 messages
+tcp://localhost:5555	591		9456, 16.0					43, 0.073
+tcp://localhost:5556	302		9966, 33.0					22, 0.073
+tcp://localhost:5557	107	   10700, 100.0					30, 0.280
+--------------------	1000 messages
+
