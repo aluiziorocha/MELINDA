@@ -1,4 +1,5 @@
 # This is the template for the operator running a Decision Level Task
+import json
 import traceback
 import numpy as np
 import cv2
@@ -8,9 +9,10 @@ image_hub = imagezmq.ImageHub(open_port='tcp://*:5575')
 
 try:
     while True:  # show streamed images until Ctrl-C
-        node_name, jpg_buffer = image_hub.recv_jpg()
+        jsonstr, jpg_buffer = image_hub.recv_jpg()
+        jsondata = json.loads(jsonstr)
         image = cv2.imdecode(np.frombuffer(jpg_buffer, dtype='uint8'), -1)
-        cv2.imshow(node_name, image)  # One window for each stream
+        cv2.imshow(jsondata['sensor_id'], image)  # One window for each stream
         image_hub.send_reply(b'OK')  # REP reply
         # detect any kepresses
         key = cv2.waitKey(1) & 0xFF

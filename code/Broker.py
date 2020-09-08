@@ -10,7 +10,7 @@ import imagezmq
 UNICAST = 0
 MULTICAST = 1
 
-flo_urls = ['tcp://localhost:5565', 'tcp://192.168.0.8:5555']  # , 'tcp://192.168.0.8:5555'
+flo_urls = ['tcp://localhost:5565']  # , 'tcp://192.168.0.8:5555'
 dlo_urls = ['tcp://localhost:5575']
 
 # Global queues accessed by threads
@@ -30,15 +30,15 @@ def flo_task(mode, node_url):
             # Get the first item queued.
             # If queue is empty raise the Empty exception
             if mode == UNICAST:
-                (node_name, jpg_buffer) = imq.get(block=False)
-                reply = sender.send_jpg(node_name, jpg_buffer)
-                omq.put((node_name, reply))
+                (jsonstr, jpg_buffer) = imq.get(block=False)
+                reply = sender.send_jpg(jsonstr, jpg_buffer)
+                omq.put((reply.decode('utf-8'), jpg_buffer))
                 # remove item from queue
                 imq.task_done()
             elif mode == MULTICAST:
-                (node_name, jpg_buffer) = timq[node_url].get(block=False)
-                reply = sender.send_jpg(node_name, jpg_buffer)
-                omq.put((node_name, reply))
+                (jsonstr, jpg_buffer) = timq[node_url].get(block=False)
+                reply = sender.send_jpg(jsonstr, jpg_buffer)
+                omq.put((reply.decode('utf-8'), jpg_buffer))
                 timq[node_url].task_done()
         except queue.Empty:
             pass
@@ -54,8 +54,8 @@ def dlo_task(node_url):
         try:
             # Get the first item queued.
             # If queue is empty raise the Empty exception
-            (node_name, jpg_buffer) = omq.get(block=False)
-            sender.send_jpg(node_name, jpg_buffer)
+            (jsonstr, jpg_buffer) = omq.get(block=False)
+            sender.send_jpg(jsonstr, jpg_buffer)
             # remove item from queue
             omq.task_done()
         except queue.Empty:
@@ -90,13 +90,13 @@ def main(mode=UNICAST):
 
     try:
         while True:
-            node_name, jpg_buffer = image_hub.recv_jpg()
+            jsonstr, jpg_buffer = image_hub.recv_jpg()
             image_hub.send_reply()
             if mode == UNICAST:
-                imq.put((node_name, jpg_buffer))
+                imq.put((jsonstr, jpg_buffer))
             elif mode == MULTICAST:
                 for flonode in flo_urls:
-                    timq[flonode].put((node_name, jpg_buffer))
+                    timq[flonode].put((jsonstr, jpg_buffer))
 
             # code to check if input queue is full and new
             # FLO nodes must rise to process it
@@ -122,4 +122,4 @@ def main(mode=UNICAST):
 
 
 if __name__ == "__main__":
-    main(mode=MULTICAST)
+    main(mode=UNICAST)
