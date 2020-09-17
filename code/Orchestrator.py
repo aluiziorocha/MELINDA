@@ -32,8 +32,17 @@ def SelectNodes(fps_demand, nodes):
             i = pivot + 1
             while i < len(nodes) or sum_capacity >= fps_demand:
                 if sum_capacity < fps_demand:
-                    sum_capacity += nodes[i][1]
-                    possible_solution.append(nodes[i])
+                    cap = fps_demand - sum_capacity
+                    try:
+                        index = [x[1] for x in nodes[i:]].index(cap) + i
+                    except ValueError:
+                        index = None
+                    if index is not None:
+                        sum_capacity += nodes[index][1]
+                        possible_solution.append(nodes[index])
+                    else:
+                        sum_capacity += nodes[i][1]
+                        possible_solution.append(nodes[i])
                     i += 1
                 else:
                     solutions.append(possible_solution)
