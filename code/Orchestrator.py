@@ -82,7 +82,6 @@ def main(args):
                                                                               [x[0] for x in nodes_selected]))
 
 
-
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("-df", "--datafile", required=True, help="File containing nodes data")
