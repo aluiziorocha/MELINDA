@@ -2,6 +2,7 @@
 import argparse
 from math import inf
 from os import path
+from numpy import product
 
 
 def Solutions(fps_demand, nodes):
@@ -44,11 +45,16 @@ def SelectNodes(fps_demand, nodes, A, B, C, D):
         best_solution = best_solution_cost = inf
         for i, combination in enumerate(solutions):
             total_fps = sum([element[1] for element in combination])
+            # Capacity waste
             wst = total_fps - fps_demand
-            lat = sum([element[2] for element in combination])
+            # Max latency
+            lat = max([element[2] for element in combination])
+            # Energy consumption
             ene = sum([element[3] for element in combination])
-            ava = sum([1 - element[4] for element in combination])
-            cost = wst * A + lat * B + ene * C + ava * D
+            # Unavailability rate
+            unava = product([1 - element[4] for element in combination])
+            # Total cost
+            cost = wst * A + lat * B + ene * C + unava * D
             if cost < best_solution_cost:
                 best_solution_cost = cost
                 best_solution = i
@@ -65,7 +71,7 @@ def main(args):
             while line:
                 col = line.split()
                 if len(col) > 1:
-                    nodes.append((col[0], int(col[1]), int(col[2]), int(col[3]), float(col[4])))
+                    nodes.append((col[0], int(col[1]), int(col[2]), float(col[3]), float(col[4])))
                 line = fp.readline()
 
     # Workflow demand in FPS
